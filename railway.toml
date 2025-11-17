@@ -1,0 +1,13 @@
+# Railway Deployment Configuration for Backend
+
+[[services]]
+name = "backend"
+source = "backend"
+build.command = "npm install"
+start.command = "npm start"
+
+[[services.env]]
+NODE_ENV = "production"
+
+[database]
+type = "postgresql"
