@@ -45,3 +45,7 @@ coverage/
 # Production
 /backend/dist
 /frontend/dist
+
+# Turborepo
+.turbo
+**/.turbo

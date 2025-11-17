@@ -1,8 +1,12 @@
 # MonetizePro Blog
 
-Um blog completo e funcional com CMS (Sistema de Gerenciamento de Conteúdo) construído com React, Node.js e PostgreSQL.
+Um blog completo e funcional com CMS (Sistema de Gerenciamento de Conteúdo) construído com React, Node.js e PostgreSQL, gerenciado como **monorepo com Turborepo**.
 
 ## 🚀 Tecnologias
+
+### Monorepo
+- **Turborepo** - Sistema de build otimizado para monorepos
+- **npm Workspaces** - Gerenciamento de dependências
 
 ### Frontend
 - **React 18** - Biblioteca JavaScript para construir interfaces de usuário
@@ -27,7 +31,7 @@ Um blog completo e funcional com CMS (Sistema de Gerenciamento de Conteúdo) con
 
 - Node.js (v16 ou superior)
 - PostgreSQL (v12 ou superior)
-- npm ou yarn
+- npm (v8 ou superior)
 
 ## 🔧 Instalação
 
@@ -51,10 +55,10 @@ CREATE DATABASE monetizepro_blog;
 Copie o arquivo `.env.example` para `.env` e configure as variáveis:
 
 ```bash
-cp .env.example .env
+cp .env.example backend/.env
 ```
 
-Edite o arquivo `.env` com suas configurações:
+Edite o arquivo `backend/.env` com suas configurações:
 
 ```env
 # Backend Configuration
@@ -80,28 +84,28 @@ ADMIN_PASSWORD=admin123
 ADMIN_NAME=Carlos Silva
 ```
 
-### 4. Instale as dependências
-
-**Backend:**
+Configure também o frontend:
 
 ```bash
-cd backend
+cp .env.example frontend/.env
+```
+
+### 4. Instale todas as dependências (monorepo)
+
+Com Turborepo, um único comando instala tudo:
+
+```bash
 npm install
 ```
 
-**Frontend:**
-
-```bash
-cd frontend
-npm install
-```
+Isso instalará:
+- ✅ Dependências da raiz (Turborepo)
+- ✅ Dependências do backend
+- ✅ Dependências do frontend
 
 ### 5. Configure o banco de dados
 
-Execute o script de setup do banco de dados:
-
 ```bash
-cd backend
 npm run db:setup
 ```
 
@@ -112,41 +116,52 @@ Este comando irá:
 
 ## 🚀 Executando o projeto
 
-### Desenvolvimento
+### Desenvolvimento (Monorepo)
 
-**Backend (Terminal 1):**
+Execute **TUDO** com um único comando:
 
 ```bash
-cd backend
 npm run dev
 ```
 
-O servidor estará rodando em `http://localhost:5000`
+Isso iniciará automaticamente:
+- ✅ Backend em `http://localhost:5000`
+- ✅ Frontend em `http://localhost:5173`
 
-**Frontend (Terminal 2):**
+Turborepo executará ambos em paralelo com cache otimizado! 🚀
+
+### Comandos individuais (se necessário)
 
 ```bash
-cd frontend
-npm run dev
-```
+# Apenas backend
+npm run dev --workspace=backend
 
-O aplicativo estará disponível em `http://localhost:5173`
+# Apenas frontend
+npm run dev --workspace=frontend
+```
 
 ### Produção
 
-**Backend:**
+**Build tudo:**
 
 ```bash
-cd backend
+npm run build
+```
+
+**Executar em produção:**
+
+```bash
 npm start
 ```
 
-**Frontend:**
+### Outros comandos úteis
 
 ```bash
-cd frontend
-npm run build
-npm run preview
+# Limpar node_modules e builds
+npm run clean
+
+# Configurar banco de dados
+npm run db:setup
 ```
 
 ## 👤 Acesso ao Sistema
@@ -161,36 +176,38 @@ Acesse: `http://localhost:5173/login`
 
 ⚠️ **IMPORTANTE:** Altere as credenciais padrão em produção!
 
-## 📁 Estrutura do Projeto
+## 📁 Estrutura do Projeto (Monorepo)
 
 ```
-blog/
-├── backend/
+blog/                        # Raiz do monorepo
+├── package.json            # Root package.json com workspaces
+├── turbo.json              # Configuração do Turborepo
+├── .env.example            # Exemplo de variáveis de ambiente
+├── README.md               # Este arquivo
+│
+├── backend/                # Workspace: Backend
 │   ├── src/
-│   │   ├── config/          # Configurações (database)
-│   │   ├── controllers/     # Controladores (auth, post, category)
-│   │   ├── middleware/      # Middlewares (auth)
-│   │   ├── models/          # Modelos (User, Post, Category)
-│   │   ├── routes/          # Rotas da API
-│   │   ├── utils/           # Utilitários (setupDatabase)
-│   │   └── server.js        # Servidor principal
-│   └── package.json
+│   │   ├── config/         # Configurações (database)
+│   │   ├── controllers/    # Controladores (auth, post, category)
+│   │   ├── middleware/     # Middlewares (auth)
+│   │   ├── models/         # Modelos (User, Post, Category)
+│   │   ├── routes/         # Rotas da API
+│   │   ├── utils/          # Utilitários (setupDatabase)
+│   │   └── server.js       # Servidor principal
+│   └── package.json        # Backend package.json
 │
-├── frontend/
+├── frontend/               # Workspace: Frontend
 │   ├── src/
-│   │   ├── components/      # Componentes reutilizáveis
-│   │   ├── pages/           # Páginas da aplicação
-│   │   ├── services/        # Serviços de API
-│   │   ├── context/         # Context API (Auth)
-│   │   ├── App.jsx          # Componente principal
-│   │   └── main.jsx         # Ponto de entrada
-│   └── package.json
+│   │   ├── components/     # Componentes reutilizáveis
+│   │   ├── pages/          # Páginas da aplicação
+│   │   ├── services/       # Serviços de API
+│   │   ├── context/        # Context API (Auth)
+│   │   ├── App.jsx         # Componente principal
+│   │   └── main.jsx        # Ponto de entrada
+│   └── package.json        # Frontend package.json
 │
-├── database/
-│   └── schema.sql           # Schema do banco de dados
-│
-├── .env.example             # Exemplo de variáveis de ambiente
-└── README.md               # Este arquivo
+└── database/
+    └── schema.sql          # Schema do banco de dados
 ```
 
 ## 🔌 API Endpoints
@@ -257,19 +274,36 @@ O design é baseado no template fornecido, com:
 - Ícones Font Awesome
 - Layout responsivo
 
-## 🛠️ Scripts Disponíveis
+## 🛠️ Scripts Disponíveis (Monorepo)
 
-### Backend
+### Root (executa em todos os workspaces)
 
-- `npm start` - Inicia o servidor em produção
-- `npm run dev` - Inicia o servidor em desenvolvimento (com nodemon)
+- `npm install` - Instala todas as dependências do monorepo
+- `npm run dev` - Inicia backend E frontend em desenvolvimento
+- `npm run build` - Build de produção de todos os projetos
+- `npm start` - Inicia todos os projetos em produção
+- `npm run clean` - Limpa node_modules e builds
 - `npm run db:setup` - Configura o banco de dados
 
-### Frontend
+### Workspace específico
 
-- `npm run dev` - Inicia o servidor de desenvolvimento
-- `npm run build` - Cria build de produção
-- `npm run preview` - Visualiza build de produção
+```bash
+# Backend
+npm run dev --workspace=backend
+npm run start --workspace=backend
+
+# Frontend
+npm run dev --workspace=frontend
+npm run build --workspace=frontend
+```
+
+## 🚀 Vantagens do Turborepo
+
+- ⚡ **Cache inteligente** - Não rebuilda o que não mudou
+- 🔄 **Execução paralela** - Backend e frontend rodam juntos
+- 📦 **Gerenciamento unificado** - Um `npm install` para tudo
+- 🎯 **Pipeline otimizado** - Builds mais rápidos
+- 🔗 **Dependências compartilhadas** - Economia de espaço
 
 ## 📝 Licença
 
@@ -277,12 +311,13 @@ MIT
 
 ## 👨‍💻 Desenvolvimento
 
-Este projeto foi desenvolvido como um blog completo com CMS, incluindo:
+Este projeto foi desenvolvido como um blog completo com CMS em **arquitetura monorepo**, incluindo:
 - Sistema de autenticação robusto
 - API RESTful completa
 - Interface administrativa moderna
 - Frontend responsivo e otimizado
 - Banco de dados PostgreSQL bem estruturado
+- **Turborepo para gerenciamento otimizado**
 
 ## 🚀 Próximos Passos
 
@@ -297,3 +332,4 @@ Sugestões para expandir o projeto:
 - [ ] Permissões granulares
 - [ ] Temas customizáveis
 - [ ] API para mobile app
+- [ ] CI/CD com cache do Turborepo

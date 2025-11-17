@@ -1,0 +1,26 @@
+{
+  "name": "monetizepro-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MonetizePro Blog - Full-stack monorepo with Turborepo",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "db:setup": "npm run db:setup --workspace=backend"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "packageManager": "npm@9.0.0"
+}

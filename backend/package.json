@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "db:setup": "node src/utils/setupDatabase.js"
+    "db:setup": "node src/utils/setupDatabase.js",
+    "clean": "rm -rf node_modules dist"
   },
   "keywords": ["blog", "cms", "nodejs", "express", "postgresql"],
   "author": "",
