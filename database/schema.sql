@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS categories (
     slug VARCHAR(100) UNIQUE NOT NULL,
     description TEXT,
     post_count INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create tags table
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS tags (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create posts table
+-- Create posts table with SEO fields
 CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
@@ -39,6 +40,8 @@ CREATE TABLE IF NOT EXISTS posts (
     summary TEXT,
     content TEXT NOT NULL,
     featured_image VARCHAR(500),
+    meta_title VARCHAR(60),
+    meta_description VARCHAR(160),
     author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
     status VARCHAR(50) DEFAULT 'draft',
@@ -47,7 +50,8 @@ CREATE TABLE IF NOT EXISTS posts (
     comments_count INTEGER DEFAULT 0,
     published_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 -- Create post_tags junction table
@@ -68,15 +72,40 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create newsletter_subscribers table
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    unsubscribed_at TIMESTAMP
+);
+
+-- Create article_views table for detailed tracking
+CREATE TABLE IF NOT EXISTS article_views (
+    id SERIAL PRIMARY KEY,
+    article_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_posts_slug ON posts(slug);
 CREATE INDEX idx_posts_author ON posts(author_id);
 CREATE INDEX idx_posts_category ON posts(category_id);
 CREATE INDEX idx_posts_status ON posts(status);
 CREATE INDEX idx_posts_published ON posts(published_at);
+CREATE INDEX idx_posts_deleted ON posts(deleted_at);
 CREATE INDEX idx_comments_post ON comments(post_id);
 CREATE INDEX idx_tags_slug ON tags(slug);
 CREATE INDEX idx_categories_slug ON categories(slug);
+CREATE INDEX idx_article_views_article ON article_views(article_id);
+CREATE INDEX idx_article_views_date ON article_views(viewed_at);
+CREATE INDEX idx_newsletter_email ON newsletter_subscribers(email);
+
+-- Create full-text search index
+CREATE INDEX idx_posts_fulltext ON posts USING gin(to_tsvector('portuguese', title || ' ' || content));
 
 -- Insert default admin user (password: admin123)
 INSERT INTO users (email, password, name, bio, role)
